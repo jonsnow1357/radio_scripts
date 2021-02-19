@@ -128,8 +128,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# project folders and files
+# local
+**/last_run.log
+**/data_in
+**/data_out
 docs/
 read/
 write/
-.log

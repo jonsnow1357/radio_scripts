@@ -41,6 +41,9 @@ class AppConfig(object):
 
 appCfg = AppConfig()
 
+class ScannerException(Exception):
+  pass
+
 class Channel(object):
 
   def __init__(self):
@@ -106,7 +109,7 @@ class BC125AT(object):
     logger.info("{} written".format(fPath))
 
   def _saveChannels_csv(self, lstCh, fPath):
-    lstKeys = ("index", "freq", "tag", "modulation", "squelch_code", "delay", "lockout",
+    lstKeys = ("idx", "freq", "tag", "modulation", "squelch_code", "delay", "lockout",
                "priority")
     with open(fPath, "w") as fOut:
       csvOut = csv.writer(fOut, lineterminator="\n")
@@ -118,12 +121,9 @@ class BC125AT(object):
         ])
     logger.info("{} written".format(fPath))
 
-  def _loadChannels_json(self):
-    dirOut = "channels_in"
-    fPath = os.path.join(dirOut, (self.model + ".json"))
-
+  def _loadChannels_json(self, fPath):
     if (not os.path.isfile(fPath)):
-      raise RuntimeError
+      raise ScannerException
 
     lstCh = []
     res = json.load(open(fPath))
@@ -131,6 +131,30 @@ class BC125AT(object):
       ch = Channel()
       ch.__dict__.update(val)
       lstCh.append(ch)
+
+    return lstCh
+
+  def _loadChannels_csv(self, fPath):
+    if (not os.path.isfile(fPath)):
+      raise ScannerException
+
+    lstCh = []
+    lstKeys = []
+    with open(fPath, "r") as fIn:
+      csvIn = csv.reader(fIn)
+      for row in csvIn:
+        if (lstKeys == []):
+          lstKeys = row
+        else:
+          res = {}
+          for val in zip(lstKeys, row):
+            if (val[0] in ("index", "freq", "squelch_code")):
+              res[val[0]] = int(val[1])
+            else:
+              res[val[0]] = val[1]
+          ch = Channel()
+          ch.__dict__.update(res)
+          lstCh.append(ch)
 
     return lstCh
 
@@ -206,7 +230,14 @@ class BC125AT(object):
         lstCh, os.path.join(appCfg.dirRead, "{}_channels.csv".format(self.model)))
 
   def writeChannels(self):
-    lstCh = self._loadChannels_json()
+    try:
+      lstCh = self._loadChannels_json(
+          os.path.join(appCfg.dirWrite, "{}_channels.json".format(self.model)))
+    except ScannerException:
+      logger.warning("json file not found, looking for csv")
+      lstCh = self._loadChannels_csv(
+          os.path.join(appCfg.dirWrite, "{}_channels.csv".format(self.model)))
+
     bCheck = True
     for ch in lstCh:
       if (len(ch.tag) > 16):
