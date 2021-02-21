@@ -21,11 +21,14 @@ import datetime
 #import six
 import argparse
 import serial
+import copy
 import json
 import csv
 
 logging.config.fileConfig("logging.cfg")
 logger = logging.getLogger("app")
+
+import radio_scripts.base as base
 
 class AppConfig(object):
 
@@ -44,57 +47,17 @@ appCfg = AppConfig()
 class ScannerException(Exception):
   pass
 
-class Channel(object):
-
-  def __init__(self):
-    self.idx = 0
-    self.freq = 0  # integer, in Hz
-    self.tag = None
-    self.modulation = None
-    self.squelch_code = None
-    self.delay = None
-    self.lockout = None
-    self.priority = None
-
-  def __str__(self):
-    return "CH {}, '{}', {} Hz, {}".format(self.idx, self.tag, self.freq, self.modulation)
-
-  def init(self, idx, freq, tag, modulation, squelch_code):
-    if (not isinstance(idx, int)):
-      raise RuntimeError
-    if (idx <= 0):
-      raise RuntimeError
-    if (not isinstance(freq, int)):
-      raise RuntimeError
-    if (freq < 0):
-      raise RuntimeError
-    if (not isinstance(tag, str)):
-      raise RuntimeError
-    if (not isinstance(modulation, str)):
-      raise RuntimeError
-    if (not isinstance(squelch_code, int)):
-      raise RuntimeError
-
-    self.idx = idx
-    self.freq = freq
-    self.tag = tag
-    self.modulation = modulation
-    self.squelch_code = squelch_code
-    self.delay = 2
-    self.lockout = 0
-    self.priority = 0
-
 _mdl_BC125AT = "BC125AT"
 
 class BC125AT(object):
 
   def __init__(self):
+    self.model = _mdl_BC125AT
     self.dev = None
     self.baudrate = 115200
     self.timeout = 0.05
     self.eos = "\r"
     self.eom = "\r"
-    self.model = _mdl_BC125AT
     self.nCh = 500
     self._conn = None
     self._config = {}
@@ -103,7 +66,9 @@ class BC125AT(object):
     with open(fPath, "w") as fOut:
       fOut.write("[\n")
       for i in range(len(lstCh)):
-        fOut.write("  {}{}\n".format(json.dumps(lstCh[i].__dict__), "" if
+        tmp = copy.deepcopy(lstCh[i].__dict__)  # copy class variables so we can change freq
+        tmp["freq"] = round((tmp["freq"] / 1e6), 6)
+        fOut.write("  {}{}\n".format(json.dumps(tmp), "" if
                                      (i == (len(lstCh) - 1)) else ","))
       fOut.write("]\n")
     logger.info("{} written".format(fPath))
@@ -115,8 +80,9 @@ class BC125AT(object):
       csvOut = csv.writer(fOut, lineterminator="\n")
       csvOut.writerow(lstKeys)
       for ch in lstCh:
+        freq = round((ch.freq / 1e6), 6)
         csvOut.writerow([
-            ch.idx, ch.freq, ch.tag, ch.modulation, ch.squelch_code, ch.delay, ch.lockout,
+            ch.idx, freq, ch.tag, ch.modulation, ch.squelch_code, ch.delay, ch.lockout,
             ch.priority
         ])
     logger.info("{} written".format(fPath))
@@ -128,9 +94,14 @@ class BC125AT(object):
     lstCh = []
     res = json.load(open(fPath))
     for val in res:
-      ch = Channel()
-      ch.__dict__.update(val)
+      ch = base.Channel()
+      ch.init(val["idx"], int(val["freq"] * 1e6), val["tag"], val["modulation"],
+              val["squelch_code"])
+      ch.delay = val["delay"]
+      ch.lockout = val["lockout"]
+      ch.priority = val["priority"]
       lstCh.append(ch)
+      #print("DBG", ch)
 
     return lstCh
 
@@ -146,15 +117,18 @@ class BC125AT(object):
         if (lstKeys == []):
           lstKeys = row
         else:
-          res = {}
-          for val in zip(lstKeys, row):
-            if (val[0] in ("index", "freq", "squelch_code")):
-              res[val[0]] = int(val[1])
-            else:
-              res[val[0]] = val[1]
-          ch = Channel()
-          ch.__dict__.update(res)
+          val = dict(zip(lstKeys, row))
+          val["idx"] = int(val["idx"])
+          val["freq"] = int(float(val["freq"]) * 1e6)
+          val["squelch_code"] = int(val["squelch_code"])
+          ch = base.Channel()
+          ch.init(val["idx"], val["freq"], val["tag"], val["modulation"],
+                  val["squelch_code"])
+          ch.delay = val["delay"]
+          ch.lockout = val["lockout"]
+          ch.priority = val["priority"]
           lstCh.append(ch)
+          #print("DBG", ch)
 
     return lstCh
 
@@ -212,7 +186,7 @@ class BC125AT(object):
       res = self.query("CIN,{}".format(i))
       res = res.split(",")
 
-      ch = Channel()
+      ch = base.Channel()
       ch.init(int(res[1]), (int(res[3]) * 100), res[2], res[4], int(res[5]))
       ch.delay = int(res[6])
       ch.lockout = int(res[7])
