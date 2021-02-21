@@ -53,14 +53,27 @@ class BC125AT(object):
 
   def __init__(self):
     self.model = _mdl_BC125AT
+    self.nCh = 500
+
+    fPath = os.path.join("scanners", (self.model + ".json"))
+    tmp = json.load(open(fPath, "r"))
+
     self.dev = None
-    self.baudrate = 115200
-    self.timeout = 0.05
+    self.conn_speed = tmp["connection"]["speed"]
+    self.conn_to = tmp["connection"]["timeout"]
     self.eos = "\r"
     self.eom = "\r"
-    self.nCh = 500
     self._conn = None
-    self._config = {}
+
+    self.squelch_map = tmp["squelch_map"]
+
+  def _reverse_squelch_code(self, code):
+    for k, v in self.squelch_map.items():
+      if (code == v):
+        return k
+    msg = "CANNOT reverse squelch code '{}'".format(code)
+    logger.error(msg)
+    raise RuntimeError
 
   def _saveChannels_json(self, lstCh, fPath):
     with open(fPath, "w") as fOut:
@@ -68,6 +81,7 @@ class BC125AT(object):
       for i in range(len(lstCh)):
         tmp = copy.deepcopy(lstCh[i].__dict__)  # copy class variables so we can change freq
         tmp["freq"] = round((tmp["freq"] / 1e6), 6)
+        tmp["squelch_code"] = self._reverse_squelch_code(tmp["squelch_code"])
         fOut.write("  {}{}\n".format(json.dumps(tmp), "" if
                                      (i == (len(lstCh) - 1)) else ","))
       fOut.write("]\n")
@@ -81,8 +95,9 @@ class BC125AT(object):
       csvOut.writerow(lstKeys)
       for ch in lstCh:
         freq = round((ch.freq / 1e6), 6)
+        squelch_code = self._reverse_squelch_code(ch.squelch_code)
         csvOut.writerow([
-            ch.idx, freq, ch.tag, ch.modulation, ch.squelch_code, ch.delay, ch.lockout,
+            ch.idx, freq, ch.tag, ch.modulation, squelch_code, ch.delay, ch.lockout,
             ch.priority
         ])
     logger.info("{} written".format(fPath))
@@ -94,9 +109,11 @@ class BC125AT(object):
     lstCh = []
     res = json.load(open(fPath))
     for val in res:
+      freq = int(val["freq"] * 1e6)
+      squelch_code = self.squelch_map[val["squelch_code"]]
+
       ch = base.Channel()
-      ch.init(val["idx"], int(val["freq"] * 1e6), val["tag"], val["modulation"],
-              val["squelch_code"])
+      ch.init(val["idx"], freq, val["tag"], val["modulation"], squelch_code)
       ch.delay = val["delay"]
       ch.lockout = val["lockout"]
       ch.priority = val["priority"]
@@ -118,12 +135,12 @@ class BC125AT(object):
           lstKeys = row
         else:
           val = dict(zip(lstKeys, row))
-          val["idx"] = int(val["idx"])
-          val["freq"] = int(float(val["freq"]) * 1e6)
-          val["squelch_code"] = int(val["squelch_code"])
+          idx = int(val["idx"])
+          freq = int(float(val["freq"]) * 1e6)
+          squelch_code = self.squelch_map[val["squelch_code"]]
+
           ch = base.Channel()
-          ch.init(val["idx"], val["freq"], val["tag"], val["modulation"],
-                  val["squelch_code"])
+          ch.init(idx, freq, val["tag"], val["modulation"], squelch_code)
           ch.delay = val["delay"]
           ch.lockout = val["lockout"]
           ch.priority = val["priority"]
@@ -144,7 +161,9 @@ class BC125AT(object):
     return self.read()
 
   def connect(self):
-    self._conn = serial.Serial(port=self.dev, baudrate=self.baudrate, timeout=self.timeout)
+    self._conn = serial.Serial(port=self.dev,
+                               baudrate=self.conn_speed,
+                               timeout=self.conn_to)
     if (not self._conn.isOpen()):
       raise RuntimeError
 
@@ -187,7 +206,7 @@ class BC125AT(object):
       res = res.split(",")
 
       ch = base.Channel()
-      ch.init(int(res[1]), (int(res[3]) * 100), res[2], res[4], int(res[5]))
+      ch.init(int(res[1]), (int(res[3]) * 100), res[2], res[4], res[5])
       ch.delay = int(res[6])
       ch.lockout = int(res[7])
       ch.priority = int(res[8])
@@ -226,14 +245,19 @@ class BC125AT(object):
       raise RuntimeError
 
     logger.info("writing channels ...")
+    cnt_ch = 0
     for ch in lstCh:
       if (ch.freq == 0):
-        res = self.query("DCH,{}".format(ch.idx))
-        if (res != "DCH,OK"):
-          raise RuntimeError
+        res = self.query("CIN,{}".format(ch.idx))
+        if (not res.endswith(",,00000000,AUTO,0,2,1,0")):
+          res = self.query("DCH,{}".format(ch.idx))
+          if (res != "DCH,OK"):
+            raise RuntimeError
+          cnt_ch += 1
       else:
         if (ch.lockout != "0"):
           logger.warning("{} is locked-out".format(ch))
+
         new = "CIN,{},{},{:08d},{},{},{},{},{}".format(ch.idx, ch.tag, (ch.freq // 100),
                                                        ch.modulation, ch.squelch_code,
                                                        ch.delay, ch.lockout, ch.priority)
@@ -242,6 +266,8 @@ class BC125AT(object):
           res = self.query(new)
           if (res != "CIN,OK"):
             raise RuntimeError
+          cnt_ch += 1
+    logger.info("updated {} channel(s)".format(cnt_ch))
 
     res = self.query("EPG")
     if (res != "EPG,OK"):

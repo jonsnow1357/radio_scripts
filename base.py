@@ -49,7 +49,7 @@ class Channel(object):
       raise RuntimeError
     if (not isinstance(modulation, str)):
       raise RuntimeError
-    if (not isinstance(squelch_code, int)):
+    if (not isinstance(squelch_code, str)):
       raise RuntimeError
 
     self.idx = idx
