@@ -253,14 +253,21 @@ class BC125AT(object):
 
     logger.info("writing channels ...")
     for ch in lstCh:
-      new = "CIN,{},{},{:08d},{},{},{},{},{}".format(ch.idx, ch.tag, (ch.freq // 100),
-                                                     ch.modulation, ch.squelch_code,
-                                                     ch.delay, ch.lockout, ch.priority)
-      res = self.query("CIN,{}".format(ch.idx))
-      if (new != res):
-        res = self.query(new)
-        if (res != "CIN,OK"):
+      if (ch.freq == 0):
+        res = self.query("DCH,{}".format(ch.idx))
+        if (res != "DCH,OK"):
           raise RuntimeError
+      else:
+        if (ch.lockout != "0"):
+          logger.warning("{} is locked-out".format(ch))
+        new = "CIN,{},{},{:08d},{},{},{},{},{}".format(ch.idx, ch.tag, (ch.freq // 100),
+                                                       ch.modulation, ch.squelch_code,
+                                                       ch.delay, ch.lockout, ch.priority)
+        res = self.query("CIN,{}".format(ch.idx))
+        if (res != new):
+          res = self.query(new)
+          if (res != "CIN,OK"):
+            raise RuntimeError
 
     res = self.query("EPG")
     if (res != "EPG,OK"):
