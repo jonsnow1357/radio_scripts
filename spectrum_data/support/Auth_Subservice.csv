@@ -1,0 +1,33 @@
+19,AM,AM
+20,HF Broadcasting of Shortwave Radio,Radiodiffusion HF(onde courte)
+21,Low Power FM,FM faible puissance
+25,FM,FM
+26,Analog TV,TV
+27,Low Power DTV,TVN faible puissance
+28,Terrestrial Satellite Digital Audio Radio Service,Émetteur terestre du service de radiodiffusion audionumérique par satellite
+29,DTV,TVN
+30,Multipoint Distribution Television,Système de distribution multipoint TV
+200,Point-to-Point,Point à point
+201,Point-to-Multipoint,Point à multipoint
+202,Point-to-Transportable,Point à transportable
+203,Transportable-to-Transportable,Transportable à transportable
+300,Base-Mobile Systems,Systèmes base-mobile
+301,Light-licensed Mobile,Mobile de licence légère
+302,Mobile Only,Mobile seulement
+304,Radiodetermination,Radiorepérage
+500,Maritime Base Station,Station de base maritime
+501,Marine Vessel,Navire marin
+640,Passive Reflector,Réflecteur passif
+641,Passive Repeater,Répéteur passif
+800,Aeronautical Base Station,Station de base aéronautique
+801,Aircraft,Aéronef
+870,Auction,Enchères
+871,Non-Auction,Non-enchères
+872,Subordinate,Subordonné
+873,RP-019,RP-019
+900,"Earth Station, Shared Bands","Station terrienne, bandes partagées"
+901,"Earth Station, Shared Bands, Transportable","Station terrienne, bandes partagées, transportable"
+902,"Earth Station, Exclusive Bands","Station terrienne, bandes exclusives"
+903,"Earth Station , Exculsive Bands, Transportrable","Station terrienne, bandes exclusives, transportable"
+904,"Earth Station, Mobile","Station terrienne, mobile"
+905,Satellite,Satellite

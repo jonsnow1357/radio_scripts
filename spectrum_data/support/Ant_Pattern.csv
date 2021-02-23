@@ -1,0 +1,69 @@
+1,Patch Antenna,Antenne à plaque
+2,L/M Generic Pattern,Patron générique M/T
+3,SRSP Reference Pattern,Patron de référence PNRH
+4,Panel Antenna,Antenne à panneau
+5,Sector Antenna,Antenne sectorielle
+6,Stacked Antennas,Antennes superposées
+A,Parabolic (Full: Solid),Parabolique (complète : pleine)
+B,Parabolic (Full: Grid),Parabolique (complète : grille)
+C,Parabolic (Sectional: Solid),Parabolique (partielle : pleine)
+D,Parabolic (Sectional: Grid),Parabolique (partielle : grille)
+E,Horn,Cornet
+F,Periscope,Périscope
+G,Yagi,Yagi
+H,Log Periodic,Log périodique
+I,Collinear Array,Ensemble colinéaire
+J,Helical,Hélicoïdal
+L,Dummy Load,Charge fictive
+M,Discone,Discone
+N,Corner Reflector,Réflecteur polyédrique
+O,Parabolic Reflector,Réflecteur parabolique
+R,Dipole,Dipôle
+RF,Reflector,Réflecteur
+S,Dipole Array,À réseau de dipôles
+U,Other,Autre
+V,Rubber Duck Antenna,Antenne "rubber duck"
+X,Whip,Fouet
+Z,Collinear,Colinéaire
+AP28,AP28,AP28
+AP29,AP29,AP29
+AP30,AP30,AP30
+AP30B,AP30B,AP30B
+AP7,AP7,AP7
+AP8,AP8,AP8
+APEF 212V01,APEF 212V01,APEF 212V01
+APENST803V01,APENST803V01,APENST803V01
+APEREC015V01,APEREC015V01,APEREC015V01
+APEUSA211V01,APEUSA211V01,APEUSA211V01
+BIFROST-RES,BIFROST-RES,BIFROST-RES
+BIFROST-TES1,BIFROST-TES1,BIFROST-TES1
+BIFROST-TES2,BIFROST-TES2,BIFROST-TES2
+BIFROST-TES3,BIFROST-TES3,BIFROST-TES3
+CCIR-391-2,CCIR-391-2,CCIR-391-2
+CCIR-810,CCIR-810,CCIR-810
+DBLTVROC0001,DBLTVROC0001,DBLTVROC0001
+DBLTVROI0001,DBLTVROI0001,DBLTVROI0001
+DBL-TYP1,DBL-TYP1,DBL-TYP1
+DBL-TYP2,DBL-TYP2,DBL-TYP2
+MIX1,MIX1,MIX1
+MIX2,MIX2,MIX2
+MODRES,MODRES,MODRES
+MODTES,MODTES,MODTES
+ND,ND,ND
+ND-EARTH,ND-EARTH,ND-EARTH
+R13RES,R13RES,R13RES
+R13TES,R13TES,R13TES
+R2RES,R2RES,R2RES
+R2TES,R2TES,R2TES
+REC BO.1900,REC BO.1900,REC BO.1900
+REC-1091,REC-1091,REC-1091
+REC-1213,REC-1213,REC-1213
+REC-1295,REC-1295,REC-1295
+REC-1631,REC-1631,REC-1631
+REC-391,REC-391,REC-391
+REC-465,REC-465,REC-465
+REC-465-5,REC-465-5,REC-465-5
+REC-509,REC-509,REC-509
+REC-580,REC-580,REC-580
+REC-580-6,REC-580-6,REC-580-6
+REC-694,REC-694,REC-694

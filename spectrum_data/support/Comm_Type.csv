@@ -1,0 +1,9 @@
+D,Duplex,Duplex
+FDD,Frequency Division Duplex,Duplex à répartition de fréquence
+H,Semi-Duplex,Semi-Duplex
+HFDD,Hybrid Frequency Division Multiplex,Multiplexage par répartition en fréquence hybride
+O,Other,Autre
+S,Simplex,Simplex
+SD,Simplex/Duplex,Simplex/Duplex
+TDD,Time Division Duplex,Duplex à répartition dans le temps
+TXRX,Tx-only/Rx-only,Tx seulement/Rx seulement

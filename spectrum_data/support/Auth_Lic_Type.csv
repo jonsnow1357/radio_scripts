@@ -1,0 +1,26 @@
+AGND,Air-Ground (800 MHz),Services air-sol (800 MHz)
+AWS,Advanced Wireless Service,Services sans fil évolués
+AWS-3,Advanced Wireless Service- Band 3,Services sans fil évolués - bande 3
+AWS-4,Advanced Wireless Service- Band 4,Services sans fil évolués - bande 4
+BRS,Broadband Radio Service,Service radio à large bande
+BWA24,Broadband Wireless Access (24 GHz),Accès à large bande sans fil (24 GHz)
+BWA38,Broadband Wireless Access (38 GHz),Accès à large bande sans fil (38 GHz)
+CELL,Cellular,Service cellulaires
+D,Developmental,Développemental
+FCFS34,Fixed Wireless Access (3.4 GHz) - FCFS,Accès fixe sans fil - PAPS
+FCFS38,Broadband Wireless Access (38 GHz) - FCFS,Accès à large bande sans fil (38 GHz) - PAPS
+FWA,Fixed Wireless Access,Accès fixe sans fil
+HPOD,Higher power and outdoor RLAN devices,Dispositifs RLAN haute puissance et extérieurs
+I-Block,I-Block (1670 MHz),Bloc I (1670 MHz)
+LIGHT,Light licensing (70-80-90 GHz),Licences simplifiées (70-80-90 GHz)
+MBS,Mobile Broadband Service,Services mobiles à large bande
+NMCS,Narrowband MCS,Communications multipoint à bande étroite
+No,CRTC Licence Required,Licence du CRTC requise
+PCS,Personal Communication Service,Services de communications personnelles
+PS49,Public Safety (4.9 GHz),Sécurité publique (4.9 GHz)
+PS700,Public Safety (700 MHz),Sécurité publique (700 MHz)
+RAC,Railway Association of Canada,Association des chemins de fer du Canada
+S,Non-Developmental,Non développemental
+WBS,Wireless Broadband Service,Services à large bande sans fil
+WCS,Wireless Communication Services,Services de télécommunications sans fil
+Yes,CRTC Exempt,CRTC exempté

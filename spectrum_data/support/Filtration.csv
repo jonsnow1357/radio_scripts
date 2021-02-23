@@ -1,0 +1,6 @@
+1,No additional isolation,Aucune isolation additionnelle
+2,"Medium isolation (e.g., band pass)","Isolation moyenne (p. ex., passe-bande)"
+3,"High isolation (e.g., multicoupler)","Isolation élevée (p. ex., multicoupleur)"
+R,Regular Power Mask,Masque régulier
+S,Simple Low Power Mask,Masque simple pour faible puissance
+T,Stringent Low Power Mask,Masque strict pour faible puissance

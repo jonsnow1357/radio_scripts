@@ -1,0 +1,16 @@
+1,Land Mobile service,Service mobile terrestre
+2,Fixed service,Service fixe
+3,Aeronautical service,Service aéronautique
+4,Maritime service,Service maritime
+5,Radiodetermination service,Service de radiorepérage
+6,Public Information service,Service d'information publique
+7,Developmental service,Service de développement
+8,Intersatellite service,Service intersatellite
+9,RR 60 (6) - Mobile station,RR 60 (6) - station mobile
+1,RR 72 - Fixed station,RR 72 - station fixe
+14,Land Mobile + Fixed services,Services mobile terrestre + fixe
+15,Aeronautical + Fixed services,Services aéronautique + fixe
+16,Maritime + Fixed services,Services maritime + fixe
+17,Aeronautical + Maritime services,Services aéronautique + maritime
+18,Land Mobile + Aeronautical services,Services mobile terrestre + aéronautique
+19,Land Mobile + Maritime services,Services mobile terrestre + maritime

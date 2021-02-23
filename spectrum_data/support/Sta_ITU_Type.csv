@@ -1,0 +1,92 @@
+AL,Aeronautical radionavigation land station,Station terrestre de radionavigation aéronautique
+AM,Aeronautical radionavigation mobile station,Station mobile de radionavigation aéronautique
+BC,"Broadcasting station, sound",Station de radiodiffusion sonore
+BT,"Broadcasting station, television",Station de radiodiffusion télévisuelle
+E1,Space research (active sensor) space station,Station spatiale (capteurs actifs) de recherche spatiale
+E2,Space research (passive sensor) space station,Station spatiale (capteurs passifs) de recherche spatiale
+E3,Space station in the Earth exploration-satellite service (active),Station spatiale d’exploration de la Terre par satellite (capteurs actifs)
+E4,Space station in the Earth exploration-satellite (passive),Station spatiale d’exploration de la Terre par satellite (capteurs passifs)
+EA,Space station in the amateur-satellite service,Station spatiale du service d’amateur par satellite
+EB,Space station in the broadcasting-satellite service (sound broadcasting),Station spatiale de radiodiffusion par satellite (radiodiffusion sonore)
+EC,Space station in the fixed-satellite service,Station spatiale du service fixe par satellite
+ED,Space telecommand space station,Station spatiale de télécommande spatiale
+EE,Space station in the standard frequency-satellite service,Station spatiale du service des fréquences étalon par satellite
+EF,Space station in the radiodetermination-satellite service,Station spatiale du service de radiorepérage par satellite
+EG,Space station in the maritime mobile-satellite service,Station spatiale du service mobile maritime par satellite
+EH,Space research space station,Station spatiale de recherche spatiale
+EI,Space station in the mobile-satellite service,Station spatiale du service mobile par satellite
+EJ,Space station in the aeronautical mobile-satellite service,Station spatiale du service mobile aéronautique par satellite
+EK,Space tracking space station,Station spatiale de poursuite spatiale
+EM,Space station in the meteorological-satellite service,Station spatiale du service de météorologie par satellite
+EN,Space station in the radionavigation-satellite service,Station spatiale du service de radionavigation par satellite
+EO,Space station in the aeronautical radionavigation-satellite service,Station spatiale du service de radionavigation aéronautique par satellite
+EQ,Space station in the maritime radionavigation-satellite service,Station spatiale du service de radionavigation maritime par satellite
+ER,Space telemetering space station,Station spatiale de télémesure spatiale
+ES,Station in the inter-satellite service,Station du service inter-satellites
+ET,Space station in the space operation service,Station spatiale du service d’exploitation spatiale
+EU,Space station in the land mobile-satellite service,Station spatiale du service mobile terrestre par satellite
+EV,Space station in the broadcasting-satellite service (television),Station spatiale du service de radiodiffusion par satellite (télévision)
+EW,Space station in the earth exploration-satellite service,Station spatiale du service d’exploration de la Terre par satellite
+EY,Space station in the time signal-satellite service,Station spatiale du service des signaux horaires par satellite
+FA,Aeronautical station,Station aéronautique
+FB,Base station,Station de base
+FC,Coast station,Station côtière
+FD,Aeronautical station in the aeronautical mobile (R) service,Station aéronautique du service mobile aéronautique (R)
+FG,Aeronautical station in the aeronautical mobile (OR) service,Station aéronautique du service mobile aéronautique (OR)
+FL,Land station,Station terrestre
+FP,Port station,Station des opérations portuaires
+FX,Fixed station,Station fixe
+LR,Radiolocation land station,Station terrestre de radiolocalisation
+MA,Aircraft station,Station d’aéronef
+ML,Land mobile station,Station mobile terrestre
+MO,Mobile station,Station mobile
+MR,Radiolocation mobile station,Station mobile de radiolocalisation
+MS,Ship station,Station de navire
+NL,Maritime radionavigation land station,Station terrestre de radionavigation maritime
+NR,Radionavigation mobile station,Station mobile de radionavigation
+OD,Oceanographic data station,Station de transmission de données océanographiques
+OE,Oceanographic data interrogating station,Station qui interroge des stations océanographiques
+PL,Combination of two or more classes of station (limited to collective entries made under the terms of ITU-R Radio Regulations Article 20.5),Combinaison de deux ou plusieurs classes de stations (s’applique uniquement aux inscriptions collectives faites aux termes de l’article 20.5 du Règlement des radiocommunications de l’UIT)
+RA,Radio astronomy station,Station de radioastronomie
+RM,Maritime radionavigation mobile station,Station mobile de radionavigation maritime
+RN,Radionavigation land station,Station terrestre de radionavigation
+SA,Meteorological aids mobile station,Station mobile du service des auxiliaires de la météorologie
+SM,Meteorological aids base station,Station de base du service des auxiliaires de la météorologie
+SS,Standard frequency and time signal station,Station émettant des fréquences étalon et des signaux horaires
+TA,Earth station in the amateur-satellite service,Station terrienne du service d’amateur par satellite
+TB,Aeronautical earth station,Station terrienne aéronautique
+TC,Earth station in the fixed-satellite service,Station terrienne du service fixe par satellite
+TD,Space telecommand earth station,Station terrienne de télécommande spatiale
+TE,Satellite EPIRB in the mobile-satellite service,Radiobalise de localisation des sinistres (EPIRB) par satellite du service mobile par satellite
+TF,Fixed earth station in the radiodetermination-satellite service,Station terrienne fixe du service de radiorepérage par satellite
+TG,Ship earth station,Station terrienne de navire
+TH,Earth station in the space research service,Station terrienne du service de recherche spatiale
+TI,Coast earth station,Station terrienne côtière
+TJ,Aircraft earth station,Station terrienne d’aéronef
+TK,Space tracking earth station,Station terrienne de poursuite spatiale
+TL,Mobile earth station in the radiodetermination-satellite service,Station terrienne mobile du service de radiorepérage par satellite
+TM,Earth station in the meteorological-satellite service,Station terrienne du service de météorologie par satellite
+TN,Fixed earth station in the radionavigation-satellite service,Station terrienne fixe du service de radionavigation par satellite
+TO,Mobile earth station in the aeronautical radionavigation-satellite service,Station terrienne mobile de radionavigation aéronautique par satellite
+TQ,Mobile earth station in the maritime radionavigation-satellite service,Station terrienne mobile de radionavigation maritime par satellite
+TR,Space telemetering earth station,Station terrienne de télémesure spatiale
+TT,Earth station in the space operation service,Station terrienne du service d’exploitation spatiale
+TU,Land mobile earth station,Station terrienne mobile terrestre
+TW,Earth station in the earth exploration-satellite service,Station terrienne du service d’exploitation de la Terre par satellite
+TX,Fixed earth station in the maritime radionavigation-satellite service,Station terrienne fixe du service de radionavigation maritime par satellite
+TY,Base earth station,Station terrienne de base
+TZ,Fixed earth station in the aeronautical radionavigation-satellite service,Station terrienne fixe de radionavigation aéronautique par satellite
+UA,Mobile earth station,Station terrienne mobile
+UB,Earth station in the broadcasting-satellite service (sound broadcasting),Station terrienne de radiodiffusion par satellite (radiodiffusion sonore)
+UD,Space telecommand mobile earth station,Station terrienne mobile de télécommande spatiale
+UE,Earth station in the standard frequency-satellite service,Station terrienne du service de fréquence étalon par satellite
+UH,Mobile earth station in the space research service,Station terrienne mobile du service de recherche spatiale
+UK,Space tracking mobile earth station,Station terrienne mobile de poursuite spatiale
+UM,Mobile earth station in the meteorological-satellite service,Station terrienne mobile du service de météorologie par satellite
+UN,Mobile earth station in the radionavigation-satellite service,Station terrienne mobile du service de radionavigation par satellite
+UR,Space telemetering mobile earth station,Station terrienne mobile de télémesure spatiale
+UT,Mobile earth station in the space operation service,Station terrienne mobile du service d’exploitation spatiale
+UV,Earth station in the broadcasting-satellite service (television),Station terrienne du service de radiodiffusion par satellite (télévision)
+UW,Mobile earth station in the earth-exploration-satellite service,Station terrienne mobile du service d’exploration de la Terre par satellite
+UY,Earth station in the time signal-satellite service,Station terrienne du service des signaux horaires par satellite
+VA,Land earth station,Station terrienne sur terre

@@ -1,0 +1,20 @@
+1,Fixed,Fixe
+2,Transportable,Transportable
+3,Mobile,Mobile
+4,Aircraft,Aéronef
+5,Ship,Navire
+6,Fixed base station,Station de base fixe
+7,Transportable base station,Station de base transportable
+8,Fixed repeater station,Station répétitrice fixe
+9,Transportable repeater station,Station répétitrice transportable
+10,Fixed hub station,Station pivot fixe
+11,Fixed remote station,Station éloignée fixe
+12,Transportable remote station,Station éloignée transportable
+13,Fixed beacon,Radiophare fixe
+14,Transportable beacon,Radiophare transportable
+15,Fixed radar station,Station radar fixe
+16,Transportable radar station,Station radar transportable
+17,Tx fixed base station,Station de base fixe Tx
+18,Rx fixed base station,Station de base fixe Rx
+19,Wide-area Mobile,Mobile étendue
+20,Wide-area Transportable,Station transportable étendue
