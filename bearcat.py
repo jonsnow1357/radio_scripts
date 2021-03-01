@@ -27,6 +27,7 @@ import csv
 
 logging.config.fileConfig("logging.cfg")
 logger = logging.getLogger("app")
+logcomms = logging.getLogger("comms")
 
 import radio_scripts.base as base
 
@@ -66,6 +67,7 @@ class BC125AT(object):
     self._conn = None
 
     self.squelch_map = tmp["squelch_map"]
+    self.config = {}
 
   def _reverse_squelch_code(self, code):
     for k, v in self.squelch_map.items():
@@ -149,11 +151,24 @@ class BC125AT(object):
 
     return lstCh
 
+  def _saveConfig_json(self, fPath):
+    with open(fPath, "w") as fOut:
+      json.dump(self.config, fOut, indent=2)
+    logger.info("{} written".format(fPath))
+
+  def _loadConfig_json(self, fPath):
+    if (not os.path.isfile(fPath)):
+      raise ScannerException
+
+    self.config = json.load(open(fPath))
+
   def read(self):
     res = self._conn.read_until(self.eom).decode()
+    logcomms.info("{}>>>{}".format(self.dev, res))
     return res.strip(self.eom)
 
   def write(self, cmd):
+    logcomms.info("{}<<<{}".format(self.dev, cmd))
     self._conn.write((cmd + self.eos).encode())
 
   def query(self, cmd):
@@ -182,12 +197,59 @@ class BC125AT(object):
     self._conn.close()
 
   def readConfig(self):
+    logger.info("reading configuration ...")
+    res = self.query("VOL")
+    self.config["volume"] = int(res.split(",")[-1])
+    res = self.query("SQL")
+    self.config["squelch"] = int(res.split(",")[-1])
+
     res = self.query("PRG")
     if (res != "PRG,OK"):
       raise RuntimeError
 
-    logger.info("reading configuration ...")
-    # TODO:
+    res = self.query("CNT")
+    self.config["contrast"] = int(res.split(",")[-1])
+    res = self.query("WXS")
+    self.config["weather"] = {"priority": int(res.split(",")[-1])}
+
+    res = self.query("EPG")
+    if (res != "EPG,OK"):
+      raise RuntimeError
+
+    self._saveConfig_json(os.path.join(appCfg.dirRead, "{}_config.json".format(self.model)))
+
+  def writeConfig(self):
+    fPath = os.path.join(appCfg.dirWrite, "{}_config.json".format(self.model))
+    try:
+      self._loadConfig_json(fPath)
+    except ScannerException:
+      logger.warning("'{}' not found".format(fPath))
+      return
+
+    logger.info("writing configuration ...")
+    if ("volume" in self.config.keys()):
+      res = self.query("VOL,{}".format(self.config["volume"]))
+      if (res != "VOL,OK"):
+        raise RuntimeError
+    if ("squelch" in self.config.keys()):
+      res = self.query("SQL,{}".format(self.config["squelch"]))
+      if (res != "SQL,OK"):
+        raise RuntimeError
+
+    res = self.query("PRG")
+    if (res != "PRG,OK"):
+      raise RuntimeError
+
+    if ("contrast" in self.config.keys()):
+      res = self.query("CNT,{}".format(self.config["contrast"]))
+      if (res != "CNT,OK"):
+        raise RuntimeError
+    if ("weather" in self.config.keys()):
+      tmp_w = self.config["weather"]
+      if ("priority" in tmp_w.keys()):
+        res = self.query("WXS,{}".format(tmp_w["priority"]))
+        if (res != "WXS,OK"):
+          raise RuntimeError
 
     res = self.query("EPG")
     if (res != "EPG,OK"):
@@ -289,6 +351,7 @@ def mainApp():
     if (cliArgs["action"] == "show"):
       pass
     elif (cliArgs["action"] == "cfg"):
+      scanner.writeConfig()
       scanner.readConfig()
     elif (cliArgs["action"] == "get"):
       scanner.readChannels()
