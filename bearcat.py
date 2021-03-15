@@ -50,6 +50,26 @@ class ScannerException(Exception):
 
 _mdl_BC125AT = "BC125AT"
 
+def _getConfig_val(dictionary, msg, key):
+  try:
+    return dictionary[key]
+  except KeyError:
+    pass
+
+  tmp = "CANNOT find {} in {}\n  allowed values: {}".format(key, msg,
+                                                            list(dictionary.keys()))
+  logger.error(tmp)
+  raise RuntimeError(tmp)
+
+def _getConfig_key(dictionary, msg, val):
+  for k, v in dictionary.items():
+    if (val == v):
+      return k
+
+  tmp = "CANNOT map {} to {}".format(val, msg)
+  logger.error(tmp)
+  raise RuntimeError(tmp)
+
 class BC125AT(object):
 
   def __init__(self):
@@ -65,17 +85,13 @@ class BC125AT(object):
     self.eos = "\r"
     self.eom = "\r"
     self._conn = None
-
-    self.squelch_map = tmp["squelch_map"]
     self.config = {}
 
-  def _reverse_squelch_code(self, code):
-    for k, v in self.squelch_map.items():
-      if (code == v):
-        return k
-    msg = "CANNOT reverse squelch code '{}'".format(code)
-    logger.error(msg)
-    raise RuntimeError
+    self._map_squelch = tmp["map_squelch"]
+    self._map_backlight = tmp["map_backlight"]
+    self._map_keypad_beep = tmp["map_keypad_beep"]
+    self._map_keypad_lock = tmp["map_keypad_lock"]
+    self._map_priority_mode = tmp["map_priority_mode"]
 
   def _saveChannels_json(self, lstCh, fPath):
     with open(fPath, "w") as fOut:
@@ -83,7 +99,8 @@ class BC125AT(object):
       for i in range(len(lstCh)):
         tmp = copy.deepcopy(lstCh[i].__dict__)  # copy class variables so we can change freq
         tmp["freq"] = round((tmp["freq"] / 1e6), 6)
-        tmp["squelch_code"] = self._reverse_squelch_code(tmp["squelch_code"])
+        tmp["squelch_code"] = _getConfig_key(self._map_squelch, "squelch_code",
+                                             tmp["squelch_code"])
         fOut.write("  {}{}\n".format(json.dumps(tmp), "" if
                                      (i == (len(lstCh) - 1)) else ","))
       fOut.write("]\n")
@@ -97,7 +114,7 @@ class BC125AT(object):
       csvOut.writerow(lstKeys)
       for ch in lstCh:
         freq = round((ch.freq / 1e6), 6)
-        squelch_code = self._reverse_squelch_code(ch.squelch_code)
+        squelch_code = _getConfig_key(self._map_squelch, "squelch_code", ch.squelch_code)
         csvOut.writerow([
             ch.idx, freq, ch.tag, ch.modulation, squelch_code, ch.delay, ch.lockout,
             ch.priority
@@ -112,7 +129,7 @@ class BC125AT(object):
     res = json.load(open(fPath))
     for val in res:
       freq = int(val["freq"] * 1e6)
-      squelch_code = self.squelch_map[val["squelch_code"]]
+      squelch_code = self._map_squelch[val["squelch_code"]]
 
       ch = base.Channel()
       ch.init(val["idx"], freq, val["tag"], val["modulation"], squelch_code)
@@ -139,7 +156,7 @@ class BC125AT(object):
           val = dict(zip(lstKeys, row))
           idx = int(val["idx"])
           freq = int(float(val["freq"]) * 1e6)
-          squelch_code = self.squelch_map[val["squelch_code"]]
+          squelch_code = self._map_squelch[val["squelch_code"]]
 
           ch = base.Channel()
           ch.init(idx, freq, val["tag"], val["modulation"], squelch_code)
@@ -209,8 +226,24 @@ class BC125AT(object):
 
     res = self.query("CNT")
     self.config["contrast"] = int(res.split(",")[-1])
+    res = self.query("BLT")
+    self.config["backlight"] = _getConfig_key(self._map_backlight, "backlight",
+                                              res.split(",")[-1])
+    self.config["weather"] = {"priority": int(res.split(",")[-1])}
     res = self.query("WXS")
     self.config["weather"] = {"priority": int(res.split(",")[-1])}
+    res = self.query("BSV")
+    self.config["charge_time"] = int(res.split(",")[-1])
+    res = self.query("KBP")
+    self.config["keypad"] = {
+        "beep": _getConfig_key(self._map_keypad_beep, "keypad_beep",
+                               res.split(",")[-2]),
+        "lock": _getConfig_key(self._map_keypad_lock, "keypad_lock",
+                               res.split(",")[-1])
+    }
+    res = self.query("PRI")
+    self.config["priority_mode"] = _getConfig_key(self._map_priority_mode, "priority_mode",
+                                                  res.split(",")[-1])
 
     res = self.query("EPG")
     if (res != "EPG,OK"):
@@ -244,12 +277,33 @@ class BC125AT(object):
       res = self.query("CNT,{}".format(self.config["contrast"]))
       if (res != "CNT,OK"):
         raise RuntimeError
+    if ("backlight" in self.config.keys()):
+      tmp = _getConfig_val(self._map_backlight, "backlight", self.config["backlight"])
+      res = self.query("BLT,{}".format(tmp))
+      if (res != "BLT,OK"):
+        raise RuntimeError
     if ("weather" in self.config.keys()):
-      tmp_w = self.config["weather"]
-      if ("priority" in tmp_w.keys()):
-        res = self.query("WXS,{}".format(tmp_w["priority"]))
-        if (res != "WXS,OK"):
-          raise RuntimeError
+      tmp_dict = self.config["weather"]
+      res = self.query("WXS,{}".format(tmp_dict["priority"]))
+      if (res != "WXS,OK"):
+        raise RuntimeError
+    if ("charge_time" in self.config.keys()):
+      res = self.query("BSV,{}".format(self.config["charge_time"]))
+      if (res != "BSV,OK"):
+        raise RuntimeError
+    if ("keypad" in self.config.keys()):
+      tmp_dict = self.config["keypad"]
+      res = self.query("KBP,{},{}".format(
+          _getConfig_val(self._map_keypad_beep, "keypad_beep", tmp_dict["beep"]),
+          _getConfig_val(self._map_keypad_lock, "keypad_lock", tmp_dict["lock"])))
+      if (res != "KBP,OK"):
+        raise RuntimeError
+    if ("priority_mode" in self.config.keys()):
+      tmp = _getConfig_val(self._map_priority_mode, "priority_mode",
+                           self.config["priority_mode"])
+      res = self.query("PRI,{}".format(tmp))
+      if (res != "PRI,OK"):
+        raise RuntimeError
 
     res = self.query("EPG")
     if (res != "EPG,OK"):
