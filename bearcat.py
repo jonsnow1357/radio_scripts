@@ -10,7 +10,7 @@ import os
 import logging
 import logging.config
 #import re
-#import time
+import time
 import datetime
 
 #sys.path.append("./")
@@ -188,8 +188,10 @@ class BC125AT(object):
     logcomms.info("{}<<<{}".format(self.dev, cmd))
     self._conn.write((cmd + self.eos).encode())
 
-  def query(self, cmd):
+  def query(self, cmd, timeout=0):
     self.write(cmd)
+    if (timeout > 0.0):
+      time.sleep(timeout)
     return self.read()
 
   def connect(self):
@@ -229,7 +231,6 @@ class BC125AT(object):
     res = self.query("BLT")
     self.config["backlight"] = _getConfig_key(self._map_backlight, "backlight",
                                               res.split(",")[-1])
-    self.config["weather"] = {"priority": int(res.split(",")[-1])}
     res = self.query("WXS")
     self.config["weather"] = {"priority": int(res.split(",")[-1])}
     res = self.query("BSV")
@@ -244,6 +245,9 @@ class BC125AT(object):
     res = self.query("PRI")
     self.config["priority_mode"] = _getConfig_key(self._map_priority_mode, "priority_mode",
                                                   res.split(",")[-1])
+
+    res = self.query("SCG")
+    self.config["scan_group"] = res.split(",")[-1]
 
     res = self.query("EPG")
     if (res != "EPG,OK"):
@@ -303,6 +307,11 @@ class BC125AT(object):
                            self.config["priority_mode"])
       res = self.query("PRI,{}".format(tmp))
       if (res != "PRI,OK"):
+        raise RuntimeError
+
+    if ("scan_group" in self.config.keys()):
+      res = self.query("SCG,{}".format(self.config["scan_group"]), timeout=0.1)
+      if (res != "SCG,OK"):
         raise RuntimeError
 
     res = self.query("EPG")
