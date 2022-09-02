@@ -22,7 +22,6 @@ import datetime
 
 #import math
 #import csv
-#import six
 #import argparse
 import csv
 import dataset

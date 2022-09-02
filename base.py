@@ -17,7 +17,6 @@ import logging
 
 #import math
 #import csv
-#import six
 
 logger = logging.getLogger("lib")
 

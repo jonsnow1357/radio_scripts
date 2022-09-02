@@ -17,13 +17,11 @@ import datetime
 #sys.path.append("../")
 
 #import math
-#import csv
-#import six
+import csv
 import argparse
 import serial
 import copy
 import json
-import csv
 
 logging.config.fileConfig("logging.cfg")
 logger = logging.getLogger("app")
@@ -75,6 +73,7 @@ class BC125AT(object):
   def __init__(self):
     self.model = _mdl_BC125AT
     self.nCh = 500
+    self.tagSize = 16
 
     fPath = os.path.join("scanners", (self.model + ".json"))
     tmp = json.load(open(fPath, "r"))
@@ -96,8 +95,8 @@ class BC125AT(object):
   def _saveChannels_json(self, lstCh, fPath):
     with open(fPath, "w") as fOut:
       fOut.write("[\n")
-      for i in range(len(lstCh)):
-        tmp = copy.deepcopy(lstCh[i].__dict__)  # copy class variables so we can change freq
+      for i, ch in enumerate(lstCh):
+        tmp = copy.deepcopy(ch.__dict__)  # copy class variables so we can change freq
         tmp["freq"] = round((tmp["freq"] / 1e6), 6)
         tmp["squelch_code"] = _getConfig_key(self._map_squelch, "squelch_code",
                                              tmp["squelch_code"])
@@ -154,7 +153,10 @@ class BC125AT(object):
           lstKeys = row
         else:
           val = dict(zip(lstKeys, row))
-          idx = int(val["idx"])
+          try:
+            idx = int(val["idx"])
+          except ValueError:
+            continue
           freq = int(float(val["freq"]) * 1e6)
           squelch_code = self._map_squelch[val["squelch_code"]]
 
@@ -358,7 +360,7 @@ class BC125AT(object):
 
     bCheck = True
     for ch in lstCh:
-      if (len(ch.tag) > 16):
+      if (len(ch.tag) > self.tagSize):
         msg = "INCORRECT tag for {}".format(ch)
         logger.error(msg)
         bCheck = False
@@ -390,7 +392,9 @@ class BC125AT(object):
         if (res != new):
           res = self.query(new)
           if (res != "CIN,OK"):
-            raise RuntimeError
+            msg = "ERROR at {}".format(ch)
+            logger.error(msg)
+            raise RuntimeError(msg)
           cnt_ch += 1
     logger.info("updated {} channel(s)".format(cnt_ch))
 
@@ -447,7 +451,7 @@ if (__name__ == "__main__"):
 
   #pyauto_base.misc.changeLoggerName("{}.log".format(modName))
 
-  appDesc = ""  # _REGEX_  appDesc = \".*\"
+  appDesc = ""
   parser = argparse.ArgumentParser(description=appDesc)
   parser.add_argument("model", help="scanner model", choices=(_mdl_BC125AT, ))
   parser.add_argument("dev", help="COM port/device")
