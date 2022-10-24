@@ -133,5 +133,5 @@ dmypy.json
 **/data_in
 **/data_out
 docs/
-read/
-write/
+scanners/read/
+scanners/write/

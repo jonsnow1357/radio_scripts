@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-# template: app_log
+#!/usr/bin/env python
 # SPDX-License-Identifier: GPL-3.0-or-later
 """app"""
 
@@ -26,8 +25,7 @@ import json
 logging.config.fileConfig("logging.cfg")
 logger = logging.getLogger("app")
 logcomms = logging.getLogger("comms")
-
-import radio_scripts.base as base
+import radio_scripts.base.air as air
 
 class AppConfig(object):
 
@@ -75,7 +73,7 @@ class BC125AT(object):
     self.nCh = 500
     self.tagSize = 16
 
-    fPath = os.path.join("scanners", (self.model + ".json"))
+    fPath = os.path.join("cfg", (self.model + ".json"))
     tmp = json.load(open(fPath, "r"))
 
     self.dev = None
@@ -130,7 +128,7 @@ class BC125AT(object):
       freq = int(val["freq"] * 1e6)
       squelch_code = self._map_squelch[val["squelch_code"]]
 
-      ch = base.Channel()
+      ch = air.Channel()
       ch.init(val["idx"], freq, val["tag"], val["modulation"], squelch_code)
       ch.delay = val["delay"]
       ch.lockout = val["lockout"]
@@ -160,7 +158,7 @@ class BC125AT(object):
           freq = int(float(val["freq"]) * 1e6)
           squelch_code = self._map_squelch[val["squelch_code"]]
 
-          ch = base.Channel()
+          ch = air.Channel()
           ch.init(idx, freq, val["tag"], val["modulation"], squelch_code)
           ch.delay = val["delay"]
           ch.lockout = val["lockout"]
@@ -332,7 +330,7 @@ class BC125AT(object):
       res = self.query("CIN,{}".format(i))
       res = res.split(",")
 
-      ch = base.Channel()
+      ch = air.Channel()
       ch.init(int(res[1]), (int(res[3]) * 100), res[2], res[4], res[5])
       ch.delay = int(res[6])
       ch.lockout = int(res[7])

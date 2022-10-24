@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# template: library
 # SPDX-License-Identifier: GPL-3.0-or-later
 """library"""
 
