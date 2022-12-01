@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""library for a communication interfaces"""
+"""library for communication interfaces"""
 
 #import site #http://docs.python.org/library/site.html
 import sys
@@ -261,12 +261,15 @@ class CommInterface(object):
     return self.readRaw(self.eom, TOmultiplier=TOmultiplier)
 
   def _writeRaw_Socket(self, strCmd, TOmultiplier=1):
-    logcomms.info("{}<< {}".format(self._connInfo.DBG,
-                                   radio_scripts.base.misc.convertStringNonPrint(strCmd)))
+    #logcomms.info("{}<< {}".format(self._connInfo.DBG,
+    #                               radio_scripts.base.misc.convertStringNonPrint(strCmd)))
 
     #t0 = datetime.datetime.now()
     try:
-      self._conn.sendall(strCmd.encode("utf-8"))
+      if (isinstance(strCmd, bytearray)):
+        self._conn.sendall(strCmd)
+      else:
+        self._conn.sendall(strCmd.encode("utf-8"))
     except socket.error as ex:
       msg = "{}: {}".format(self, ex)
       logger.error(msg, exc_info=True)
@@ -293,7 +296,10 @@ class CommInterface(object):
     self._writeRaw_Socket(strCmd, TOmultiplier)
 
   def write(self, strCmd):
-    return self.writeRaw(strCmd + self.eos)
+    if (isinstance(strCmd, bytearray)):
+      return self.writeRaw(strCmd)
+    else:
+      return self.writeRaw(strCmd + self.eos)
 
   def _communicate_Socket(self, strCmd, strEndRead, TOmultiplier=1):
     if (len(strCmd) > 0):
