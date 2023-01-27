@@ -196,11 +196,12 @@ class CommInterface(object):
 
     self._conn = None
 
-  def _readRaw_Socket(self, strEndRead, TOmultiplier=1):
+  def _readRaw_Socket(self, strEndRead, TOmultiplier=1, bBytes=False):
     if (not isinstance(strEndRead, str)):
       raise NotImplementedError  # this should not happen
 
     tmp_timeout = (TOmultiplier * self._connInfo.timeout)
+    buff = bytearray()
     reply = ""
 
     tlim = datetime.timedelta(seconds=tmp_timeout)
@@ -210,9 +211,9 @@ class CommInterface(object):
     t0 = datetime.datetime.now()
     dt = datetime.datetime.now() - t0
     while (dt < tlim):
-      ln = bytes()
+      dt = datetime.datetime.now() - t0
       try:
-        ln = self._conn.recv(1024)
+        buff += self._conn.recv(1024)
       except socket.timeout as ex:
         #msg = "{}: {}".format(self, ex)
         #logger.error(msg, exc_info=True)
@@ -222,17 +223,21 @@ class CommInterface(object):
         msg = "{}: {}".format(self, ex)
         logger.error(msg, exc_info=True)
         raise CommException(msg)
-      reply += ln.decode("utf-8", errors="ignore")
+      if (len(buff) == 0):
+        continue
+      reply += buff.decode("utf-8", errors="ignore")
       if ((strEndRead != "") and (reply.endswith(strEndRead))):
         break
-      dt = datetime.datetime.now() - t0
+
+    if (bBytes):
+      return buff
 
     logcomms.info("{}>>'{}'".format(self._connInfo.DBG,
                                     radio_scripts.base.misc.convertStringNonPrint(reply)))
     #logcomms.info("{}:time {}".format(self._connInfo.DBG, dt))
     if ((strEndRead != "") and (dt > tlim)):
       msg = "{}: timeout {}".format(self, dt)
-      #logger.error(msg)
+      logger.error(msg)
       #logger.error(reply)
       raise CommTimeoutException(msg)
 
@@ -241,11 +246,12 @@ class CommInterface(object):
     reply = [t for t in reply if (t != "")]  # remove empty lines
     return reply
 
-  def readRaw(self, strEndRead, TOmultiplier=1):
+  def readRaw(self, strEndRead, TOmultiplier=1, bBytes=False):
     """
     Reads until strEndRead is found or until timeout expires.
     :param strEndRead: string
     :param TOmultiplier: timeout multiplier
+    :param bBytes: returns bytes instead of doing some basic string clean-up
     :return: list of strings (ideally lines received)
     """
     if (self._conn is None):
@@ -253,7 +259,7 @@ class CommInterface(object):
           self._connInfo.type))
       return []
 
-    reply = self._readRaw_Socket(strEndRead, TOmultiplier)
+    reply = self._readRaw_Socket(strEndRead, TOmultiplier, bBytes)
 
     return reply
 
@@ -261,8 +267,8 @@ class CommInterface(object):
     return self.readRaw(self.eom, TOmultiplier=TOmultiplier)
 
   def _writeRaw_Socket(self, strCmd, TOmultiplier=1):
-    #logcomms.info("{}<< {}".format(self._connInfo.DBG,
-    #                               radio_scripts.base.misc.convertStringNonPrint(strCmd)))
+    logcomms.info("{}<< {}".format(self._connInfo.DBG,
+                                   radio_scripts.base.misc.convertStringNonPrint(strCmd)))
 
     #t0 = datetime.datetime.now()
     try:
@@ -275,11 +281,6 @@ class CommInterface(object):
       logger.error(msg, exc_info=True)
       raise CommException(msg)
     #logcomms.info("{}:time {}".format(self._connInfo.DBG, datetime.datetime.now() - t0))
-
-  def _writeRaw_UART(self, strCmd, TOmultiplier=1):
-    logcomms.info("{}:({: >4})<< {}".format(
-        self._connInfo.DBG, len(strCmd),
-        radio_scripts.base.misc.convertStringNonPrint(strCmd)))
 
   def writeRaw(self, strCmd, TOmultiplier=1):
     """
