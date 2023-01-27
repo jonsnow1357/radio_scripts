@@ -237,7 +237,7 @@ class CommInterface(object):
     #logcomms.info("{}:time {}".format(self._connInfo.DBG, dt))
     if ((strEndRead != "") and (dt > tlim)):
       msg = "{}: timeout {}".format(self, dt)
-      logger.error(msg)
+      #logger.error(msg)
       #logger.error(reply)
       raise CommTimeoutException(msg)
 
