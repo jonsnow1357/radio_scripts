@@ -159,7 +159,7 @@ class CommInterface(object):
     else:
       self._connInfo = CommInterfaceInfo(val)
 
-  def _openSocket(self):
+  def _open_Socket(self):
     logger.info("SOCKET connection {}".format(self._connInfo.INFO))
     self._conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     self._conn.settimeout(self._connInfo.timeout)
@@ -179,9 +179,9 @@ class CommInterface(object):
       raise CommException(msg)
 
   def open(self):
-    self._openSocket()
+    self._open_Socket()
 
-  def _closeSocket(self):
+  def _close_Socket(self):
     if (self._conn is None):
       return
 
@@ -192,7 +192,7 @@ class CommInterface(object):
     if (self._conn is None):
       return
 
-    self._closeSocket()
+    self._close_Socket()
 
     self._conn = None
 
