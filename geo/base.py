@@ -77,6 +77,7 @@ def maidenhead(dec_lat, dec_lon):
   grid_lon_subsq = _grid_lower[int(adj_lon_remainder / 5)]
 
   return grid_lon_sq + grid_lat_sq + grid_lon_field + grid_lat_field + grid_lon_subsq + grid_lat_subsq
+
 #
 # def usage():
 #   print 'This script takes two arguments, decimal latitude and longitude.'

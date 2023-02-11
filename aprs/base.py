@@ -10,7 +10,7 @@ import os
 import logging
 #import re
 #import time
-#import datetime
+import datetime
 
 #sys.path.append("./")
 #sys.path.append("../")
@@ -20,16 +20,18 @@ import logging
 
 logger = logging.getLogger("lib")
 
+def getDHMTime():
+  dt = datetime.datetime.now(datetime.timezone.utc)
+  return "{}{}{}z".format(dt.day, dt.hour, dt.minute)
+
 def mkMessage(toCall, msg, mId=""):
   if (len(toCall) > 9):
     _to = toCall[:9]
   else:
     _to = toCall
-  _msg = msg.replace("|", "").translate({'|': '', '~': '', '{': ''})
+  _msg = msg.translate(str.maketrans("", "", "|~{"))
   if (len(msg) > 67):
-    _msg = msg[:67]
-  else:
-    _msg = msg
+    _msg = _msg[:67]
   if (len(mId) == 0):
     return ":{: <9}:{}".format(_to, _msg)
   else:
@@ -40,19 +42,17 @@ def mkBulletin(bId, msg):
     _id = bId[0]
   else:
     _id = bId
-  _msg = msg.replace("|", "").translate({'|': '', '~': '', '{': ''})
+  _msg = msg.translate(str.maketrans("", "", "|~{"))
   if (len(msg) > 67):
-    _msg = msg[:67]
-  else:
-    _msg = msg
+    _msg = _msg[:67]
   return ":BLN{}     :{}".format(_id, _msg)
 
-def mkStatus(text):
-  _text = text.replace("|", "").translate({'|': '', '~': ''})
-  if (len(text) > 62):
-    _text = text[:62]
-  else:
-    _text = text
+def mkStatus(text, bTS=False):
+  _text = text.translate(str.maketrans("", "", "|~"))
+  if (bTS and (len(_text) < 55)):
+    _text = getDHMTime() + _text
+  elif (len(text) > 62):
+    _text = _text[:62]
   return ">{}".format(_text)
 
 def mkPositionNoTS(lat, long, comment):

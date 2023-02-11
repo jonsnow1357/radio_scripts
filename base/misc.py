@@ -20,8 +20,8 @@ import logging
 logger = logging.getLogger("lib")
 
 def convertStringNonPrint(s):
-  if (isinstance(s, bytes)):
-    s = s.decode("utf-8")
+  if (isinstance(s, bytes) or isinstance(s, bytearray)):
+    s = s.decode("utf-8", errors="ignore")
 
   if (not isinstance(s, str)):
     msg = "NOT a string: {}".format(s)

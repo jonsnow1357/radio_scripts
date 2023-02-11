@@ -117,9 +117,9 @@ def mkFrame(dstAddr, srcAddr, routing, content):
     tmp = _ax25_encode_addr(via[1])
     tmp[6] |= 0b01100001  # last address has the HDLC bit set
     frame += tmp
-  frame += [0x03, 0xF0]  # ctrl field = 0x03 (UI), protocol ID = 0xF0 (none)
+  frame += bytearray([0x03, 0xF0])  # ctrl field = 0x03 (UI), protocol ID = 0xF0 (none)
 
-  msg = [ord(c) for c in content]
+  msg = bytearray([ord(c) for c in content])
   frame += msg
   kiss_frame = _kiss_frame(frame)
   #print("DBG", kiss_frame)
