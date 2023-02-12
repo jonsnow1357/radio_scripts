@@ -20,9 +20,15 @@ import datetime
 
 logger = logging.getLogger("lib")
 
+import radio_scripts.geo.base
+
+_SYM_48_TBD = ["/", "Q"]
+
+_symbol = _SYM_48_TBD
+
 def getDHMTime():
   dt = datetime.datetime.now(datetime.timezone.utc)
-  return "{}{}{}z".format(dt.day, dt.hour, dt.minute)
+  return "{:0>2}{:0>2}{:0>2}z".format(dt.day, dt.hour, dt.minute)
 
 def mkMessage(toCall, msg, mId=""):
   if (len(toCall) > 9):
@@ -55,9 +61,25 @@ def mkStatus(text, bTS=False):
     _text = _text[:62]
   return ">{}".format(_text)
 
-def mkPositionNoTS(lat, long, comment):
+def mkPositionNoTS(lat, long, comment, bTS=False):
+  res = radio_scripts.geo.base.signed2dms(lat)
+  if (lat > 0.0):
+    _lat = "{:0>2}{:0>2}.{:0>2}N".format(res[0], res[1], res[2])
+  else:
+    _lat = "{:0>2}{:0>2}.{:0>2}S".format(res[0], res[1], res[2])
+  res = radio_scripts.geo.base.signed2dms(long)
+  if (long > 0.0):
+    _long = "{:0>3}{:0>2}.{:0>2}E".format(res[0], res[1], res[2])
+  else:
+    _long = "{:0>3}{:0>2}.{:0>2}W".format(res[0], res[1], res[2])
+
   if (len(comment) > 43):
     _comment = comment[:43]
   else:
     _comment = comment
-  return "={}/{}Q{}".format(lat, long, _comment)
+
+  if (bTS):
+    return "@{}{}{}{}{}{}".format(getDHMTime(), _lat, _symbol[0], _long, _symbol[1],
+                                  _comment)
+  else:
+    return "!{}{}{}{}{}".format(_lat, _symbol[0], _long, _symbol[1], _comment)

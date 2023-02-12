@@ -14,12 +14,10 @@ import logging
 #sys.path.append("./")
 #sys.path.append("../")
 
-#import math
+import math
 #import csv
-# _ANY_ more imports
 
 logger = logging.getLogger("lib")
-# _ANY_ more pyauto* imports
 
 _grid_upper = "ABCDEFGHIJKLMNOPQRSTUVWX"
 _grid_lower = "abcdefghijklmnopqrstuvwx"
@@ -37,7 +35,20 @@ def dms2signed(degree, minute, second):
     raise NotImplementedError
   if ((second < 0.0) or (second > 60.0)):
     raise NotImplementedError
+
   return round(float(degree) + float(minute / 60.0) + float(second / 3600.0), 6)
+
+def signed2dms(value):
+  if ((value < -180.0) or (value > 180.0)):
+    raise NotImplementedError
+
+  tmp = [math.fabs(v) for v in math.modf(value)]
+  degree = int(tmp[1])
+  tmp = [math.fabs(v) for v in math.modf(60.0 * tmp[0])]
+  minute = int(tmp[1])
+  tmp = [math.fabs(v) for v in math.modf(60.0 * tmp[0])]
+  second = int(tmp[1])
+  return [degree, minute, second]
 
 def maidenhead(dec_lat, dec_lon):
   """
@@ -77,46 +88,3 @@ def maidenhead(dec_lat, dec_lon):
   grid_lon_subsq = _grid_lower[int(adj_lon_remainder / 5)]
 
   return grid_lon_sq + grid_lat_sq + grid_lon_field + grid_lat_field + grid_lon_subsq + grid_lat_subsq
-
-#
-# def usage():
-#   print 'This script takes two arguments, decimal latitude and longitude.'
-#   print 'Example for Newington, Connecticut (W1AW):'
-#   print 'python base.py 41.714775 -72.727260'
-#   print 'returns: FN31pr'
-#
-# def test():
-#   # First four test examples are from "Conversion Between Geodetic and Grid Locator Systems",
-#   # by Edmund T. Tyson N5JTY QST January 1989
-#   test_data = (
-#       ('Munich', (48.14666, 11.60833), 'JN58td'),
-#       ('Montevideo', (-34.91, -56.21166), 'GF15vc'),
-#       ('Washington, DC', (38.92, -77.065), 'FM18lw'),
-#       ('Wellington', (-41.28333, 174.745), 'RE78ir'),
-#       ('Newington, CT (W1AW)', (41.714775, -72.727260), 'FN31pr'),
-#       ('Palo Alto (K6WRU)', (37.413708, -122.1073236), 'CM87wj'),
-#   )
-#   print 'Running self test\n'
-#   passed = True
-#   for name, latlon, grid in test_data:
-#     print 'Testing %s at %f %f:' % (name, latlon[0], latlon[1])
-#     test_grid = to_grid(latlon[0], latlon[1])
-#     if test_grid != grid:
-#       print 'Failed ' + test_grid + ' should be ' + grid
-#       passed = False
-#     else:
-#       print 'Passed ' + test_grid
-#   print ''
-#   if passed: print 'Passed!'
-#   else: print 'Failed!'
-#
-# def main(argv=None):
-#   if argv is None: argv = sys.argv
-#   if len(argv) != 3:
-#     usage()
-#     print ''
-#     test()
-#   else:
-#     print to_grid(float(argv[1]), float(argv[2]))
-#
-# main()
