@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""monitor APRS packets on APRS-IS"""
+"""monitor APRS packets on TNC"""
 
 #import site #http://docs.python.org/library/site.html
 import sys
@@ -26,8 +26,8 @@ logcomms = logging.getLogger("comms")
 
 import radio_scripts.base.comm
 import radio_scripts.aprs.base
-import radio_scripts.aprs.kiss
 import radio_scripts.aprs.config
+import radio_scripts.aprs.kiss
 import radio_scripts.aprs.stats
 
 _appConfig = radio_scripts.aprs.config.APRSConfig()
@@ -39,6 +39,8 @@ def mainApp():
   if (cliArgs["list"]):
     _appConfig.showInfo()
     return
+  _appStats.thldFrom = 4
+  _appStats.thldTo = 4
 
   conn = radio_scripts.base.comm.CommInterface(_appConfig.conn)
   #conn.eom = "\n"
@@ -57,7 +59,13 @@ def mainApp():
           #logger.info("{}>{}".format(srcAddr, dstAddr))
           #logger.info(raw_pkt)
           packet = aprslib.parse(raw_pkt)
+          #logger.info(packet)
           logger.info(f"{packet['from']: <9} -> {packet['to']: <9} {packet['format']}")
+          if (packet["format"].startswith("pos")):
+            if ("comment" in packet.keys()):
+              logger.info(f"  comment: {packet['comment']}")
+            if ("weather" in packet.keys()):
+              logger.info(f"  weather: {packet['weather']}")
           _appStats.update(packet)
       except radio_scripts.base.comm.CommTimeoutException:
         pass

@@ -42,11 +42,12 @@ def mainApp():
   #conn.eom = "\n"
   conn.open()
 
-  radio_scripts.aprs.base.setSymbol(_appConfig.position["symbol"])
-  data = radio_scripts.aprs.base.mkPositionNoTS(_appConfig.position["coordinates"][0],
-                                                _appConfig.position["coordinates"][1],
-                                                cliArgs["comment"],
-                                                bTS=True)
+  radio_scripts.aprs.base.setSymbol(_appConfig.object["symbol"])
+  data = radio_scripts.aprs.base.mkObject(_appConfig.object["name"],
+                                          _appConfig.object["coordinates"][0],
+                                          _appConfig.object["coordinates"][1],
+                                          cliArgs["comment"],
+                                          bLive=True)
   #print("DBG", data)
 
   kiss_frame = radio_scripts.aprs.kiss.mkFrame("APN000", _appConfig.mycall, VIA, data)
@@ -75,7 +76,7 @@ if (__name__ == "__main__"):
 
   appDesc = ""
   parser = argparse.ArgumentParser(description=appDesc)
-  parser.add_argument("comment", help="comment", nargs="?", default="APRS node")
+  parser.add_argument("comment", help="comment", nargs="?", default="APRS object")
   parser.add_argument("-f", "--cfg", default=appCfgPath, help="configuration file path")
   parser.add_argument("-l",
                       "--list",

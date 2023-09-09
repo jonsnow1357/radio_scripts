@@ -29,6 +29,8 @@ class APRSStats(object):
     self.thldFrom = 1
     self.dictTo = {}
     self.thldTo = 1
+    self.dictType = {}
+    self.thldType = 0
 
   def update(self, aprsPkt):
     self.nPkt += 1
@@ -40,6 +42,10 @@ class APRSStats(object):
       self.dictTo[aprsPkt["to"]] += 1
     else:
       self.dictTo[aprsPkt["to"]] = 1
+    if (aprsPkt["format"] in self.dictType.keys()):
+      self.dictType[aprsPkt["format"]] += 1
+    else:
+      self.dictType[aprsPkt["format"]] = 1
 
   def showInfo(self):
     logger.info("total packets: {}".format(self.nPkt))
@@ -53,5 +59,11 @@ class APRSStats(object):
     res = dict([(k, v) for k, v in self.dictTo.items() if (v > self.thldTo)])
     if (len(res) > 0):
       logger.info("TO stats (> {} msg):".format(self.thldTo))
+      for k, v in res.items():
+        logger.info(f"  {k: <9} - {v} message(s)")
+
+    res = dict([(k, v) for k, v in self.dictType.items() if (v > self.thldType)])
+    if (len(res) > 0):
+      logger.info("TYPE stats (> {} msg):".format(self.thldType))
       for k, v in res.items():
         logger.info(f"  {k: <9} - {v} message(s)")

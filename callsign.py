@@ -27,14 +27,14 @@ logger = logging.getLogger("app")
 
 def _getCallsingInfo_CA(callsign):
   logger.info("going to Industry Canada")
-  twill.browser.go("https://apc-cap.ic.gc.ca/pls/apc_anon/query_amat_cs$.startup")
-  # for f in twill.commands.showforms():
-  #   print("DBG", f)
+  twill.commands.go("https://apc-cap.ic.gc.ca/pls/apc_anon/query_amat_cs$.startup")
+  twill.commands.code(200)
   twill.commands.fv("2", "P_CALLSIGN", callsign)
   twill.commands.submit()
+  logger.info("submit ...")
 
   url_details = None
-  for link in twill.commands.showlinks():
+  for link in twill.browser.links:
     if ("callsign.QueryViewByKey" in link.url):
       url_details = "https://apc-cap.ic.gc.ca/pls/apc_anon/{}".format(link.url)
   if (url_details is None):
@@ -43,7 +43,8 @@ def _getCallsingInfo_CA(callsign):
 
   #print("DBG", url_details)
   logger.info("going to details page")
-  twill.browser.go(url_details)
+  twill.commands.go(url_details)
+  twill.commands.code(200)
   #print("DBG", twill.browser.html)
   tree = lxml.html.fromstring(twill.browser.html)
   ret_callsign = tree.xpath("/html/body/main/div[3]/table/tr[1]/td")[0].text.strip()
@@ -70,11 +71,11 @@ def _getCallsingInfo_CA(callsign):
 
 def _getCallsingInfo_US(callsign):
   logger.info("going to FCC")
-  twill.browser.go("https://wireless2.fcc.gov/UlsApp/UlsSearch/searchAmateur.jsp")
-  # for f in twill.commands.showforms():
-  #   print("DBG", f)
+  twill.commands.go("https://wireless2.fcc.gov/UlsApp/UlsSearch/searchAmateur.jsp")
+  twill.commands.code(200)
   twill.commands.fv("1", "ulsCallSign", callsign)
   twill.commands.submit()
+  logger.info("submit ...")
 
   url_details = None
   for link in twill.commands.showlinks():
@@ -86,7 +87,8 @@ def _getCallsingInfo_US(callsign):
 
   #print("DBG", url_details)
   logger.info("going to details page")
-  twill.browser.go(url_details)
+  twill.commands.go(url_details)
+  twill.commands.code(200)
   #print("DBG", twill.browser.html)
   tree = lxml.html.fromstring(twill.browser.html)
   # yapf: disable
@@ -113,11 +115,11 @@ def _getCallsingInfo_US(callsign):
 
 def _getCallsingInfo_other(callsign):
   logger.info("going to hamcall.net")
-  twill.browser.go("https://hamcall.net/call")
-  # for f in twill.commands.showforms():
-  #   print("DBG", f)
+  twill.commands.go("https://hamcall.net/call")
+  twill.commands.code(200)
   twill.commands.fv("2", "callsign", callsign)
   twill.commands.submit()
+  logger.info("submit ...")
 
   #print("DBG", twill.browser.html)
   tree = lxml.html.fromstring(twill.browser.html)

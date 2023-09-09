@@ -19,8 +19,8 @@ import math
 
 logger = logging.getLogger("lib")
 
-_grid_upper = "ABCDEFGHIJKLMNOPQRSTUVWX"
-_grid_lower = "abcdefghijklmnopqrstuvwx"
+regexLatDMS_APRS = r"\d{4}\.\d{2}[NS]"
+regexLongDMS_APRS = r"\d{5}\.\d{2}[EW]"
 
 def dms2signed(degree, minute, second):
   """
@@ -49,6 +49,9 @@ def signed2dms(value):
   tmp = [math.fabs(v) for v in math.modf(60.0 * tmp[0])]
   second = int(tmp[1])
   return [degree, minute, second]
+
+_grid_upper = "ABCDEFGHIJKLMNOPQRSTUVWX"
+_grid_lower = "abcdefghijklmnopqrstuvwx"
 
 def maidenhead(dec_lat, dec_lon):
   """
