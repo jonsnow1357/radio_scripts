@@ -126,7 +126,7 @@ def mkFrame(dstAddr, srcAddr, routing, content):
   return kiss_frame
 
 def splitFrames(lstB):
-  #print("DBG", [hex(t) for t in lstB])
+  #print("DBG", "".join([hex(t).replace("0x", "\\x") for t in lstB]))
   res = []
   idx = -1
   for i, b in enumerate(lstB):
@@ -139,11 +139,11 @@ def splitFrames(lstB):
         idx += 1
         continue
     res[idx] += [lstB[i]]
-  logger.info("split into {} frame(s)".format(len(res)))
+  logger.debug("split into {} frame(s)".format(len(res)))
   return res
 
 def parseFrame(kissFrame):
-  #print("DBG", [hex(t) for t in kissFrame])
+  #print("DBG", "".join([hex(t).replace("0x", "\\x") for t in kissFrame]))
   frame = _kiss_unframe(kissFrame)
   #print("DBG", [hex(t) for t in frame])
 
@@ -154,7 +154,11 @@ def parseFrame(kissFrame):
       break
   if (idx == -1):
     raise KISSException("NOT an APRS frame: {}".format([hex(t) for t in frame]))
-  content = frame[(idx + 2):].decode(encoding="ascii")
+  try:
+    content = frame[(idx + 2):].decode(encoding="ascii")
+  except UnicodeDecodeError:
+    print("DBG", "".join([hex(t).replace("0x", "\\x") for t in kissFrame]))
+    raise RuntimeError
   address = frame[:idx]
   #print("DBG", content)
 

@@ -26,8 +26,8 @@ logger = logging.getLogger("app")
 import radio_scripts.geo.base
 
 class TestGeo_base(unittest.TestCase):
-  cwd = None
-  lclDir = None
+  cwd = ""
+  lclDir = ""
 
   @classmethod
   def setUpClass(cls):

@@ -10,13 +10,13 @@ import logging
 import logging.config
 #import re
 import time
-#import datetime
+import datetime
 
 #sys.path.append("./")
 #sys.path.append("../")
 
 #import math
-#import csv
+import csv
 import argparse
 import aprslib
 
@@ -32,8 +32,72 @@ import radio_scripts.aprs.stats
 
 _appConfig = radio_scripts.aprs.config.APRSConfig()
 _appStats = radio_scripts.aprs.stats.APRSStats()
+_csv_path = os.path.join(".", "data_out", "aprs.csv")
+
+def _log_start():
+  if (not os.path.isdir("data_out")):
+    os.mkdir("data_out")
+  if (not os.path.isfile(_csv_path)):
+    logger.info("creating {}".format(_csv_path))
+    with open(_csv_path, "w") as f_out:
+      csv_out = csv.writer(f_out, lineterminator="\n")
+      csv_out.writerow(["timestamp", "format", "FROM", "TO", "comment"])
+
+def _log_packet(packet):
+  global _csv_path
+
+  ts = datetime.datetime.now()
+  _csv_path = os.path.join(
+      ".", "data_out", "{:04d}-{:02d}-{:02d}_aprs.csv".format(ts.year, ts.month, ts.day))
+  _log_start()
+
+  # logger.info(packet)
+  logger.info(f"{packet['from']: <9} -> {packet['to']: <9} {packet['format']}")
+  comment = ""
+  if (packet["format"].startswith("pos")):
+    if ("comment" in packet.keys()):
+      logger.info(f"  comment: {packet['comment']}")
+    if ("weather" in packet.keys()):
+      logger.info(f"  weather: {packet['weather']}")
+      comment = f"temp {packet['weather']['temperature']}"
+  elif (packet["format"] == "beacon"):
+    logger.info(f"  text: {packet['text']}")
+    comment = packet["text"]
+  elif (packet["format"] == "object"):
+    logger.info(f"  object: {packet['object_format']},{packet['comment']}")
+    comment = f"{packet['object_format']},{packet['comment']}"
+  elif (packet["format"] == "status"):
+    logger.info(f"  status: {packet['status']}")
+    comment = packet["status"]
+  elif (packet["format"] == "message"):
+    if ("message_text" in packet.keys()):
+      logger.info(f"  message to {packet['addresse']}: {packet['message_text']}")
+    else:
+      logger.info(f"  message to {packet['addresse']}: {packet['response']}")
+    comment = packet["addresse"]
+
+  with open(_csv_path, "a") as f_out:
+    csv_out = csv.writer(f_out, lineterminator="\n")
+    csv_out.writerow([
+        ts.strftime("%Y-%m-%dT%H%M%S"), packet["format"], packet["from"], packet["to"],
+        comment
+    ])
+
+def _log_error(strFrom, strTo, strComment):
+  global _csv_path
+
+  ts = datetime.datetime.now()
+  _csv_path = os.path.join(
+      ".", "data_out", "{:04d}-{:02d}-{:02d}_aprs.csv".format(ts.year, ts.month, ts.day))
+  _log_start()
+
+  with open(_csv_path, "a") as f_out:
+    csv_out = csv.writer(f_out, lineterminator="\n")
+    csv_out.writerow([ts.strftime("%Y-%m-%dT%H%M%S"), "ERROR", strFrom, strTo, strComment])
 
 def mainApp():
+  global _csv_path
+
   logger.info(f"using aprslib {aprslib.version_info}")
   _appConfig.readCfg(cliArgs["cfg"])
   if (cliArgs["list"]):
@@ -46,33 +110,52 @@ def mainApp():
   #conn.eom = "\n"
   conn.open()
 
+  ts = datetime.datetime.now()
+  _csv_path = os.path.join(
+      ".", "data_out", "{:04d}-{:02d}-{:02d}_aprs.csv".format(ts.year, ts.month, ts.day))
+  _log_start()
+
   try:
     while (True):
       try:
         res = conn.readRaw("", bBytes=True)
-        if (len(res) == 0):
-          continue
-        lst_frames = radio_scripts.aprs.kiss.splitFrames(res)
-        for frm in lst_frames:
-          [dstAddr, srcAddr, routing, content] = radio_scripts.aprs.kiss.parseFrame(frm)
-          raw_pkt = "{}>{},{}:{}".format(srcAddr, dstAddr, routing, content)
-          #logger.info("{}>{}".format(srcAddr, dstAddr))
-          #logger.info(raw_pkt)
-          packet = aprslib.parse(raw_pkt)
-          #logger.info(packet)
-          logger.info(f"{packet['from']: <9} -> {packet['to']: <9} {packet['format']}")
-          if (packet["format"].startswith("pos")):
-            if ("comment" in packet.keys()):
-              logger.info(f"  comment: {packet['comment']}")
-            if ("weather" in packet.keys()):
-              logger.info(f"  weather: {packet['weather']}")
-          _appStats.update(packet)
-      except radio_scripts.base.comm.CommTimeoutException:
-        pass
-      except (aprslib.exceptions.ParseError, aprslib.exceptions.UnknownFormat) as ex:
+      except radio_scripts.base.comm.CommTimeoutException as ex:
         logger.warning(ex)
-        logger.warning(raw_pkt)
-        pass
+        continue
+      if (len(res) == 0):
+        continue
+
+      lst_frames = radio_scripts.aprs.kiss.splitFrames(res)
+      for frm in lst_frames:
+        dst_addr = ""
+        src_addr = ""
+        routing = ""
+        content = ""
+        raw_pkt = ""
+        try:
+          [dst_addr, src_addr, routing, content] = radio_scripts.aprs.kiss.parseFrame(frm)
+          if (routing == ""):
+            raw_pkt = "{}>{}:{}".format(src_addr, dst_addr, content)
+          else:
+            raw_pkt = "{}>{},{}:{}".format(src_addr, dst_addr, routing, content)
+          if (content.strip("\n\r") == ""):
+            _log_error(src_addr, dst_addr, "empty message")
+            continue
+          #print("DBG", raw_pkt)
+          #logger.info("{}>{}".format(src_addr, dst_addr))
+          packet = aprslib.parse(raw_pkt)
+          _log_packet(packet)
+          _appStats.update(packet)
+        except radio_scripts.aprs.kiss.KISSException as ex:
+          logger.warning(str(ex) + " (KISS)")
+          logger.warning(frm)
+          _log_error(src_addr, dst_addr, "decode")
+          pass
+        except (aprslib.exceptions.ParseError, aprslib.exceptions.UnknownFormat) as ex:
+          logger.warning(str(ex) + " (parse)")
+          logger.warning(frm)
+          _log_error(src_addr, dst_addr, "parse")
+          pass
       time.sleep(0.5)
   except KeyboardInterrupt:
     pass
@@ -101,8 +184,6 @@ if (__name__ == "__main__"):
 
   appDesc = ""
   parser = argparse.ArgumentParser(description=appDesc)
-  parser.add_argument("dstcall", help="destination call", nargs="?", default="APN000")
-  parser.add_argument("message", help="message", nargs="?", default="APRS TEST MESSAGE")
   parser.add_argument("-f", "--cfg", default=appCfgPath, help="configuration file path")
   parser.add_argument("-l",
                       "--list",

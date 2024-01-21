@@ -26,8 +26,8 @@ logger = logging.getLogger("app")
 import radio_scripts.aprs.kiss
 
 class TestAPRSKISS_base(unittest.TestCase):
-  cwd = None
-  lclDir = None
+  cwd = ""
+  lclDir = ""
 
   @classmethod
   def setUpClass(cls):
