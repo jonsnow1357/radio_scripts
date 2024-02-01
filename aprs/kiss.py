@@ -153,12 +153,19 @@ def parseFrame(kissFrame):
       idx = i
       break
   if (idx == -1):
-    raise KISSException("NOT an APRS frame: {}".format([hex(t) for t in frame]))
+    raise KISSException("NOT an APRS frame: {}".format("".join(
+        [hex(t).replace("0x", "\\x") for t in kissFrame])))
   try:
     content = frame[(idx + 2):].decode(encoding="ascii")
-  except UnicodeDecodeError:
-    print("DBG", "".join([hex(t).replace("0x", "\\x") for t in kissFrame]))
-    raise RuntimeError
+  except UnicodeDecodeError as ex:
+    logger.warning(ex)
+    logger.warning("".join([hex(t).replace("0x", "\\x") for t in kissFrame]))
+    try:
+      content = frame[(idx + 2):].decode(encoding="ascii", errors="ignore")
+    except UnicodeDecodeError as ex:
+      logger.error(ex)
+      logger.error("".join([hex(t).replace("0x", "\\x") for t in kissFrame]))
+      raise RuntimeError
   address = frame[:idx]
   #print("DBG", content)
 

@@ -137,6 +137,7 @@ dmypy.json
 [._]sw[a-p]
 
 # local
+*sql
 **/last_run.log
 **/data_in
 **/data_out
